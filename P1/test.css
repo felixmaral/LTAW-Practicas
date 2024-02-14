@@ -1,0 +1,43 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #4CAF50, #8BC34A); /* Cambia los colores según tus preferencias */
+    color: #fff; /* Color del texto en la página */
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.2); /* Fondo semitransparente para el encabezado */
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #fff;
+}
+
+main {
+    text-align: center;
+    padding: 50px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.2); /* Fondo semitransparente para el pie de página */
+}
+
+/* Agrega estilos adicionales según sea necesario para tus productos y contenido principal */
+
