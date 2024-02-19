@@ -10,7 +10,7 @@ const server = http.createServer((req, res) => {
   console.log("Petición recibida!");
 
   //-- Cabecera que indica el tipo de datos del
-  //-- cuerpo de la respuesta: Texto plano
+  //-- cuerpo de la respuesta: HTML
   res.setHeader('Content-Type', 'text/html');
 
   //-- Mensaje del cuerpo
@@ -45,7 +45,6 @@ const server = http.createServer((req, res) => {
         <!-- Pie de página con información adicional y enlaces útiles -->
         <p>&copy; 2024 FMusic</p>
     </footer>
-
 </body>
 </html>
 `);
