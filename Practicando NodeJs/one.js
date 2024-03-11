@@ -1,26 +1,52 @@
 // Cargar modulos de Node JS
 
 const http = require('http')
+const url = require('url')
 
-const server = http.createServer();
+const URL = url.URL;
 
-const Puerto = 8080;
+const puerto = 8080;
 
-function atender(req, res) {
+let count = 1;
+
+function print_info_request(req) {
+
+    const myURL = new URL(req.url, 'http://' + req.headers['host'])
+
+    console.log('');
+    console.log('Método: ' + req.method);
+    console.log('Recurso: ' + req.url);
+    console.log('Versión: ' + req.httpVersion);
+    console.log('Cabeceras: \n');
+    
+    for (header_name in req.headers)
+        console.log(header_name + ': ' + req.headers[header_name]);
+
+    console.log('');
+    console.log('URL completa: ' + myURL.href)
+    console.log('Ruta: ' + myURL.pathname)
+
+}
+
+const server = http.createServer((req, res) => {
     //-- req: http.IncomingMessage: Mensaje de solicitud
     //-- res: http.ServerResponse: Mensaje de respuesta (vacío)
 
+
     //-- Indicamos que se ha recibido una petición
-    console.log('Petición recibida')
+    console.log('Petición recibida ' + count);
 
-    res.write
-}
+    //-- Llamamos a la funcion de informacion de la solicitud
+    print_info_request(req)
 
-//-- Activar la función de retrollamada del servidor
-server.on('request', atender);
+    res.write('Cuerpo de la respuesta');
+    res.end();
+
+    count += 1;
+});
 
 //-- Activar el servidor. A la escucha de peitciones en el puerto 8080
-server.listen(Puerto);
+server.listen(puerto);
 
 console.log('\n Servidor Activo \n')
 
