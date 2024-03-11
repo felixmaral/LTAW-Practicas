@@ -1,5 +1,6 @@
 const http = require('http');
 const fs = require('fs');
+const path = require('path');
 
 //-- Definir el puerto a utilizar
 const PUERTO = 9090;
@@ -7,13 +8,20 @@ const PUERTO = 9090;
 const pagina_main = 'index.html'
 const pagina_error = 'error.html'
 
+fs.readFile(pagina_main, 'utf8', (err, data_index) => {
+    if (err) {
+        console.log('Error al leer el archivo')
+    }
+    console.log('Archivo "' + pagina_main + '" leido')
+});
+
 const server = http.createServer((req, res)=>{
-    console.log("Petición recibida!");
+    console.log("Petición recibida");
 
     //-- Valores de la respuesta por defecto (Ok)
     let code = 200;
     let code_msg = "OK";
-    let page = pagina_main;
+    let page = data;
 
     //-- Analizar el recurso
     //-- Construir el objeto url con la url de la solicitud
@@ -40,4 +48,4 @@ const server = http.createServer((req, res)=>{
 //-- Activar el servidor: ¡Que empiece la fiesta!
 server.listen(PUERTO);
 
-console.log("Servidor FMStore . Escuchando en puerto: " + PUERTO);
+console.log("\n Servidor Activo en " + PUERTO + '\n');
