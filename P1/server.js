@@ -11,14 +11,14 @@ const css = 'index.css'
 
 
 
-const server = http.createServer((req, res)=>{
+const server = http.createServer((req, res)=> {
+
     console.log("Petición recibida");
 
     //-- Analizar el recurso
     //-- Construir el objeto url con la url de la solicitud
     const url = new URL(req.url, 'http://' + req.headers['host']);
     console.log('Ruta: ' + url.pathname);
-
 
     if (url.pathname == '/' || url.pathname.endsWith(".html")) {
         recurso = url.pathname.substring(1)
@@ -62,7 +62,7 @@ const server = http.createServer((req, res)=>{
         recurso = url.pathname.substring(1)
         code = 200;
         code_msg = "Ok";
-        fs.readFile(recurso, 'utf8', (err, data_index) => {
+        fs.readFile(recurso, (err, data_index) => {
             if (err) {
                 console.log('Error al leer el archivo')
             }
@@ -76,10 +76,6 @@ const server = http.createServer((req, res)=>{
             res.end();
         });
     }
-
-    //-- Generar la respusta en función de las variables
-    //-- code, code_msg y page
-    
 });
 
 //-- Activar el servidor: ¡Que empiece la fiesta!
