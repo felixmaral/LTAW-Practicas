@@ -7,8 +7,8 @@ const PUERTO = 9090;
 
 const pagina_main = 'index.html'
 const pagina_error = 'error.html'
-const css = 'index.css'
 
+//-- Función principal de gestion de peticiones
 const server = http.createServer((req, res)=> {
 
     console.log("Petición recibida");
@@ -26,7 +26,7 @@ const server = http.createServer((req, res)=> {
             if (err) {
                 console.log('Error al leer el archivo')
             }
-            console.log('Archivo "' + pagina_main + '" leido')
+            console.log('Archivo "' + pagina_main + '" enviado')
             page = data_index;
             
             res.statusCode = code;
@@ -64,12 +64,31 @@ const server = http.createServer((req, res)=> {
             if (err) {
                 console.log('Error al leer el archivo')
             }
-            console.log('Archivo "' + recurso + '" leido')
+            console.log('Archivo "' + recurso + '" enviado')
             page = data_index;
             
             res.statusCode = code;
             res.statusMessage = code_msg;
             res.setHeader('Content-Type','text/jpeg');
+            res.write(data_index);
+            res.end();
+        });
+    }
+
+    else {
+        code = 404;
+        code_msg = "Error";
+        console.log('Error')
+        fs.readFile(pagina_error, (err, data_index) => {
+            if (err) {
+                console.log('Error al leer el archivo')
+            }
+            console.log('Archivo "' + pagina_error + '" enviado')
+            page = data_index;
+            
+            res.statusCode = code;
+            res.statusMessage = code_msg;
+            res.setHeader('Content-Type','text/html');
             res.write(data_index);
             res.end();
         });
