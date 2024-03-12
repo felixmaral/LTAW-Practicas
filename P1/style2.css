@@ -30,6 +30,7 @@ h1 {
     border: 1px solid #ddd;
     border-radius: 5px;
     text-align: center;
+    overflow: hidden; /* Para ocultar el desbordamiento de la animación */
 }
 
 .product img {
@@ -47,17 +48,27 @@ h1 {
 }
 
 button {
-    margin-top: auto; /* Centra el botón en la parte inferior del contenedor */
+    display: block;
+    margin-top: 15px; /* Ajusta la separación del texto superior */
+    margin-left: auto;
+    margin-right: auto;
     padding: 8px 12px;
     background-color: #333;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 button:hover {
     background-color: #555;
+    transform: scale(1.05); /* Efecto de escala al pasar el ratón por encima */
+}
+
+button:active {
+    background-color: #333;
+    transform: scale(0.95); /* Efecto de pulsación al hacer clic */
 }
 
 footer {
