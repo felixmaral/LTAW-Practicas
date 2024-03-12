@@ -9,8 +9,6 @@ const pagina_main = 'index.html'
 const pagina_error = 'error.html'
 const css = 'index.css'
 
-
-
 const server = http.createServer((req, res)=> {
 
     console.log("Petición recibida");
