@@ -18,7 +18,7 @@ const server = http.createServer((req, res)=> {
     const url = new URL(req.url, 'http://' + req.headers['host']);
     console.log('Ruta: ' + url.pathname);
 
-    if (url.pathname == '/' || url.pathname.endsWith(".html")) {
+    if (url.pathname == '/') {
         recurso = url.pathname.substring(1)
         code = 200;
         code_msg = "Ok";
@@ -32,7 +32,7 @@ const server = http.createServer((req, res)=> {
             res.statusCode = code;
             res.statusMessage = code_msg;
             res.setHeader('Content-Type','text/html');
-            res.write(data_index);
+            res.write(page);
             res.end();
         });
     }
@@ -51,6 +51,25 @@ const server = http.createServer((req, res)=> {
             res.statusCode = code;
             res.statusMessage = code_msg;
             res.setHeader('Content-Type','text/css');
+            res.write(data_index);
+            res.end();
+        });
+    }
+
+    else if (url.pathname.endsWith('.html')) {
+        recurso = url.pathname.substring(1)
+        code = 200;
+        code_msg = "Ok";
+        fs.readFile(recurso, 'utf8', (err, data_index) => {
+            if (err) {
+                console.log('Error al leer el archivo')
+            }
+            console.log('Archivo "' + recurso + '" leido')
+            page = data_index;
+            
+            res.statusCode = code;
+            res.statusMessage = code_msg;
+            res.setHeader('Content-Type','text/html');
             res.write(data_index);
             res.end();
         });
