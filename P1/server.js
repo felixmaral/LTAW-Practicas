@@ -94,6 +94,25 @@ const server = http.createServer((req, res)=> {
         });
     }
 
+    else if (url.pathname.endsWith('.jpg')) {
+        recurso = url.pathname.substring(1)
+        code = 200;
+        code_msg = "Ok";
+        fs.readFile(recurso, (err, data_index) => {
+            if (err) {
+                console.log('Error al leer el archivo')
+            }
+            console.log('Archivo "' + recurso + '" enviado')
+            page = data_index;
+            
+            res.statusCode = code;
+            res.statusMessage = code_msg;
+            res.setHeader('Content-Type','text/jpg');
+            res.write(data_index);
+            res.end();
+        });
+    }
+
     else {
         code = 404;
         code_msg = "Error";
