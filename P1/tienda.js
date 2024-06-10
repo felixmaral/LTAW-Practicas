@@ -9,8 +9,9 @@ const pagina_main = './pages/index.html'
 const pagina_error = './pages/error.html'
 let  fileListHtml = '<ul>'
 
+//-- Función que añade a la lista (fileListHtml) los archivos que hay en un directorio (dir)
 function generateFileList(dir) {
-    const files = fs.readdirSync(dir); // Leer los archivos del directorio (devuelve lista de string)
+    const files = fs.readdirSync(dir); // Leer los archivos del directorio (devuelve un array de string)
     files.forEach(file => {
         fileListHtml += `<li>${file}</li>`;
     });
@@ -143,6 +144,10 @@ const server = http.createServer((req, res)=> {
             </body>
             </html>
         `);
+
+        fileListHtml = '<ul>'
+
+        console.log('Lista de archivos enviada')
     } 
 
     else {
