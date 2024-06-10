@@ -7,6 +7,14 @@ const PUERTO = 9090;
 
 const pagina_main = './pages/index.html'
 const pagina_error = './pages/error.html'
+let  fileListHtml = '<ul>'
+
+function generateFileList(dir) {
+    const files = fs.readdirSync(dir); // Leer los archivos del directorio (devuelve lista de string)
+    files.forEach(file => {
+        fileListHtml += `<li>${file}</li>`;
+    });
+}
 
 //-- Función principal de gestion de peticiones
 const server = http.createServer((req, res)=> {
@@ -113,7 +121,32 @@ const server = http.createServer((req, res)=> {
         });
     }
 
+    else  if (url.pathname == '/ls') {
+        
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        
+        generateFileList('./pages');
+        generateFileList('./style');
+        generateFileList('./img');
+        
+        res.end(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>File List</title>
+            </head>
+            <body>
+                <h1>File List</h1>
+                ${fileListHtml}
+            </body>
+            </html>
+        `);
+    } 
+
     else {
+        console.log(req.url)
         code = 404;
         code_msg = "Error";
         console.log('Error')
