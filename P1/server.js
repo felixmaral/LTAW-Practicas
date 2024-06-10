@@ -5,8 +5,8 @@ const path = require('path');
 //-- Definir el puerto a utilizar
 const PUERTO = 9090;
 
-const pagina_main = 'index.html'
-const pagina_error = 'error.html'
+const pagina_main = './pages/index.html'
+const pagina_error = './pages/error.html'
 
 //-- Función principal de gestion de peticiones
 const server = http.createServer((req, res)=> {
@@ -19,7 +19,7 @@ const server = http.createServer((req, res)=> {
     console.log('Ruta: ' + url.pathname);
 
     if (url.pathname == '/') {
-        recurso = url.pathname.substring(1)
+        recurso = './pages' + url.pathname.substring(1)
         code = 200;
         code_msg = "Ok";
         fs.readFile(pagina_main, 'utf8', (err, data_index) => {
@@ -38,7 +38,7 @@ const server = http.createServer((req, res)=> {
     }
 
     else if (url.pathname.endsWith('.css')) {
-        recurso = url.pathname.substring(1)
+        recurso = './style/' + url.pathname.substring(1)
         code = 200;
         code_msg = "Ok";
         fs.readFile(recurso, 'utf8', (err, data_index) => {
@@ -57,7 +57,7 @@ const server = http.createServer((req, res)=> {
     }
 
     else if (url.pathname.endsWith('.html')) {
-        recurso = url.pathname.substring(1)
+        recurso = './pages/' + url.pathname.substring(1)
         code = 200;
         code_msg = "Ok";
         fs.readFile(recurso, 'utf8', (err, data_index) => {
@@ -76,7 +76,7 @@ const server = http.createServer((req, res)=> {
     }
 
     else if (url.pathname.endsWith('.jpeg')) {
-        recurso = url.pathname.substring(1)
+        recurso = './img/' + url.pathname.substring(1)
         code = 200;
         code_msg = "Ok";
         fs.readFile(recurso, (err, data_index) => {
@@ -95,7 +95,7 @@ const server = http.createServer((req, res)=> {
     }
 
     else if (url.pathname.endsWith('.jpg')) {
-        recurso = url.pathname.substring(1)
+        recurso = './img/' + url.pathname.substring(1)
         code = 200;
         code_msg = "Ok";
         fs.readFile(recurso, (err, data_index) => {
