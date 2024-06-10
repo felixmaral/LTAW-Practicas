@@ -133,7 +133,7 @@ const server = http.createServer((req, res)=> {
     }
 });
 
-//-- Activar el servidor: ¡Que empiece la fiesta!
+//-- Lanzar Servidor
 server.listen(PUERTO);
 
 console.log("\n Servidor Activo en " + PUERTO + '\n');
