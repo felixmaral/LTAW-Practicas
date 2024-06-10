@@ -65,6 +65,25 @@ const server = http.createServer((req, res)=> {
         });
     }
 
+    else if (url.pathname.endsWith('.ico')) {
+        recurso = './img/' + url.pathname.substring(1)
+        code = 200;
+        code_msg = "Ok";
+        fs.readFile(recurso, 'utf8', (err, data_index) => {
+            if (err) {
+                console.log('Error al leer el archivo')
+            }
+            console.log('Archivo "' + recurso + '" leido')
+            page = data_index;
+        
+            res.statusCode = code;
+            res.statusMessage = code_msg;
+            res.setHeader('Content-Type','image/x-icon');
+            res.write(data_index);
+            res.end();
+        });
+    }
+
     else if (url.pathname.endsWith('.html')) {
         recurso = './pages/' + url.pathname.substring(1)
         code = 200;
