@@ -99,7 +99,7 @@ main {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
 }
 
 .product {
@@ -109,11 +109,21 @@ main {
     border-radius: 5px;
     width: 30%;
     text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .product img {
     max-width: 100%;
     height: auto;
+    object-fit: contain;
+    width: 100%;
+    height: 200px; /* Altura fija para todas las imágenes */
 }
 
 .product h3 {
@@ -242,7 +252,8 @@ main {
 
 .product-info .btn {
     margin-top: 1rem;
-    font-size: 1rem; /* Tamaño de letra en dispositivos móviles */
+    font-size: 1rem; 
+    background: #ffffe0; /* Fondo amarillo pálido */
 }
 
 .additional-info {
@@ -265,4 +276,3 @@ main {
 .additional-info ul li {
     margin: 0.5rem 0;
 }
-
