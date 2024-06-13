@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-//-- Definir el puerto a utilizar
+//-- Definir el puerto a utilizar y las rutas de las páginas principales
 const PUERTO = 9090;
 
 const pagina_main = './pages/index.html';
@@ -90,6 +90,5 @@ const server = http.createServer((req, res) => {
 
 //-- Lanzar Servidor
 server.listen(PUERTO);
-
 console.log("\n Servidor Activo en " + PUERTO + '\n');
 
