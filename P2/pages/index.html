@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>Temproove</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <img src="logo.jpg" class=logo-img alt="Logo Temproove">
+            <div class="logo">
+                <h1>Temproove</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Inicio</a></li>
+                <li>Productos</li>
+                <li>Sobre Nosotros</li>
+                <li>Contacto</li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h2>Bienvenido a Temproove</h2>
+                <p>Encuentra los mejores instrumentos al mejor precio</p>
+                <a href="#products" class="btn">Ver Productos</a>
+            </div>
+        </section>
+
+        <section id="products" class="products">
+            
+            <div class="product-grid">
+                <article class="product">
+                    <img src="violin_bernd_hiller.jpeg" alt="Violín Bernd Hiller">
+                    <h3><a href="violin_bernd_hiller.html">Violín Bernd Hiller</a></h3>
+                    <p>Violín acústico</p>
+                    <span class="price">$ 9555</span>
+                </article>
+                <article class="product">
+                    <img src="guitarra_electrica_red.jpeg" alt="Guitarra Electrica Red">
+                    <h3><a href="guitarra_electrica_red.html">Guitarra Electrica Red</a></h3>
+                    <p>Guitarra eléctrica</p>
+                    <span class="price">$ 249</span>
+                </article>
+                <article class="product">
+                    <img src="hemingway_DP_501_MKI_RW.jpeg" alt="Piano Hemingway">
+                    <h3><a href="hemingway_DP_501.html">Piano Hemingway</a></h3>
+                    <p>Piano eléctrico</p>
+                    <span class="price">$ 499</span>
+                </article>
+                <!-- Agrega más productos según sea necesario -->
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <h2>Sobre Nosotros</h2>
+            <p>Temproove es una empresa dedicada a proporcionar instrumentos musicales de alta calidad a músicos de todo el mundo. Nuestro compromiso es ofrecer productos excepcionales y un servicio al cliente insuperable.</p>
+            </section>
+    
+            <section id="contact" class="contact">
+                <h2>Contacto</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="name">Nombre:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensaje:</label>
+                        <textarea id="message" name="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Enviar</button>
+                </form>
+            </section>
+        </main>
+    
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 Temproove. Todos los derechos reservados.</p>
+                <ul class="social-links">
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Instagram</a></li>
+                </ul>
+            </div>
+        </footer>
+    </body>
+    
+    </html>
+    
