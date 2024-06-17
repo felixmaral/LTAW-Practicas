@@ -94,73 +94,77 @@ const server = http.createServer((req, res) => {
                 handleFileResponse(res, pagina_error, 'text/html');
             }
         }
-    } else if (req.method === 'POST' && pathname === '/login') {
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-        req.on('end', () => {
-            console.log('Datos recibidos del formulario:', body);
-            const parsedBody = qs.parse(body);
-            const { username, password } = parsedBody;
 
-            fs.readFile('tienda.json', 'utf8', (err, data) => {
-                if (err) {
-                    console.error('Error al leer el archivo JSON:', err);
-                    res.writeHead(500, { 'Content-Type': 'text/html' });
-                    res.end('Error interno del servidor');
-                    return;
-                }
-
-                let jsonData;
-                try {
-                    jsonData = JSON.parse(data);
-                } catch (parseErr) {
-                    console.error('Error al parsear el archivo JSON:', parseErr);
-                    res.writeHead(500, { 'Content-Type': 'text/html' });
-                    res.end('Error interno del servidor');
-                    return;
-                }
-
-                console.log('Datos del JSON:', jsonData);
-                const usuario = verificarCredenciales(username, password, jsonData.usuarios);
-
-                if (usuario) {
-                    res.writeHead(200, { 'Content-Type': 'text/html' });
-                    res.end(`
-                        <!DOCTYPE html>
-                        <html lang="es">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Login Exitoso</title>
-                        </head>
-                        <body>
-                            <h1>Login Exitoso</h1>
-                            <p>Bienvenido, ${usuario.nombreReal}</p>
-                        </body>
-                        </html>
-                    `);
-                    
-                } else {
-                    res.writeHead(401, { 'Content-Type': 'text/html' });
-                    res.end(`
-                        <!DOCTYPE html>
-                        <html lang="es">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Error de Login</title>
-                        </head>
-                        <body>
-                            <h1>Error de Login</h1>
-                            <p>Usuario o contraseña incorrectos</p>
-                        </body>
-                        </html>
-                    `);
-                }
+    } else if (req.method === 'POST') {
+        if (pathname === '/login') {
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
             });
-        });
+            req.on('end', () => {
+                console.log('Datos recibidos del formulario:', body);
+                const parsedBody = qs.parse(body);
+                const { username, password } = parsedBody;
+
+                fs.readFile('tienda.json', 'utf8', (err, data) => {
+                    if (err) {
+                        console.error('Error al leer el archivo JSON:', err);
+                        res.writeHead(500, { 'Content-Type': 'text/html' });
+                        res.end('Error interno del servidor');
+                        return;
+                    }
+
+                    let jsonData;
+
+                    try {
+                        jsonData = JSON.parse(data);
+                    } catch (parseErr) {
+                        console.error('Error al parsear el archivo JSON:', parseErr);
+                        res.writeHead(500, { 'Content-Type': 'text/html' });
+                        res.end('Error interno del servidor');
+                        return;
+                    }
+
+                    const usuario = verificarCredenciales(username, password, jsonData.usuarios);
+
+                    if (usuario) {
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end(`
+                            <!DOCTYPE html>
+                            <html lang="es">
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Login Exitoso</title>
+                            </head>
+                            <body>
+                                <h1>Login Exitoso</h1>
+                                <p>Bienvenido, ${usuario.nombreReal}</p>
+                            </body>
+                            </html>
+                        `);
+                        
+                    } else {
+                        res.writeHead(401, { 'Content-Type': 'text/html' });
+                        res.end(`
+                            <!DOCTYPE html>
+                            <html lang="es">
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Error de Login</title>
+                            </head>
+                            <body>
+                                <h1>Error de Login</h1>
+                                <p>Usuario o contraseña incorrectos</p>
+                            </body>
+                            </html>
+                        `);
+                    }
+                });
+            });
+        }
+        
     } else {
         handleFileResponse(res, pagina_error, 'text/html');
     }
