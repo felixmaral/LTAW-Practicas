@@ -1,0 +1,39 @@
+{
+    "usuarios": [
+      {
+        "nombre": "root",
+        "password": "1234",
+        "nombreReal": "Admin",
+        "correo": "admin@example.com"
+      },
+      {
+        "nombre": "pepito",
+        "password": "1234",
+        "nombreReal": "Pepe",
+        "correo": "pepito1@example.com"
+      }
+    ],
+    "productos": [
+      {
+        "nombre": "Producto1",
+        "descripcion": "Descripción del Producto1",
+        "precio": 100,
+        "cantidad": 10
+      },
+      {
+        "nombre": "Producto2",
+        "descripcion": "Descripción del Producto2",
+        "precio": 200,
+        "cantidad": 5
+      }
+    ],
+    "pedidos": [
+      {
+        "nombreUsuario": "usuario1",
+        "direccionEnvio": "Calle Falsa 123",
+        "numeroTarjeta": "1234-5678-8765-4321",
+        "productosComprados": ["Producto1", "Producto2"]
+      }
+    ]
+  }
+  
