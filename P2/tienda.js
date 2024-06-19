@@ -8,7 +8,7 @@ const PUERTO = 9090;
 const pagina_main = './pages/index.html';
 const pagina_error = './pages/error.html';
 const pagina_login = './pages/login.html';
-const pagina_log_error = './pages/log_error.html';
+const pagina_procesar = './pages/procesar.html';
 
 const mimeTypes = {
     '.html': { type: 'text/html', folder: './pages' },
@@ -111,18 +111,68 @@ const server = http.createServer((req, res) => {
                     const usuario = verificarCredenciales(username, password, jsonData.usuarios);
 
                     if (usuario) {
-                        res.writeHead(200, {
-                            'Content-Type': 'text/html',
-                            'Set-Cookie': `username=${username}; path=/`
-                        });
+                        res.setHeader('Set-Cookie', `username_session=${username}; path=/`);
                         handleFileResponse(res, pagina_main, "text/html");
                     } else {
-                        console.log('Error al iniciar sesion')
+                        console.log('Error al iniciar sesión');
                         handleFileResponse(res, pagina_login, 'text/html');
                     }
                 });
             } else {
                 handleFileResponse(res, pagina_login, 'text/html');
+            }
+        } else if (pathname === '/procesar') {
+            const direccion = searchParams.get('direccion');
+            const tarjeta = searchParams.get('tarjeta');
+            const cookies = req.headers.cookie;
+
+            if (cookies) {
+                const cookieMap = Object.fromEntries(cookies.split('; ').map(c => c.split('=')));
+                const username = cookieMap['username'];
+
+                fs.readFile('tienda.json', 'utf8', (err, data) => {
+                    if (err) {
+                        console.error('Error al leer el archivo JSON:', err);
+                        res.writeHead(500, { 'Content-Type': 'text/html' });
+                        res.end('Error interno del servidor');
+                        return;
+                    }
+
+                    let jsonData;
+
+                    try {
+                        jsonData = JSON.parse(data);
+                    } catch (parseErr) {
+                        console.error('Error al parsear el archivo JSON:', parseErr);
+                        res.writeHead(500, { 'Content-Type': 'text/html' });
+                        res.end('Error interno del servidor');
+                        return;
+                    }
+
+                    const nuevoPedido = {
+                        nombreUsuario: username,
+                        direccionEnvio: direccion,
+                        numeroTarjeta: tarjeta,
+                        productosComprados: []  // Añadir los productos comprados aquí
+                    };
+
+                    jsonData.pedidos.push(nuevoPedido);
+
+                    fs.writeFile('tienda.json', JSON.stringify(jsonData, null, 2), (err) => {
+                        if (err) {
+                            console.error('Error al escribir en el archivo JSON:', err);
+                            res.writeHead(500, { 'Content-Type': 'text/html' });
+                            res.end('Error interno del servidor');
+                            return;
+                        }
+
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end('Pedido procesado correctamente');
+                    });
+                });
+            } else {
+                res.writeHead(400, { 'Content-Type': 'text/html' });
+                res.end('No hay usuario autenticado');
             }
         } else {
             const ext = path.extname(pathname);
@@ -140,5 +190,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PUERTO);
-console.log("\n Servidor Activo en " + PUERTO + "\n");
+console.log("\nServidor Activo en " + PUERTO + "\n");
 
