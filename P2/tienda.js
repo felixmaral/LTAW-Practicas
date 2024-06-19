@@ -111,6 +111,10 @@ const server = http.createServer((req, res) => {
                     const usuario = verificarCredenciales(username, password, jsonData.usuarios);
 
                     if (usuario) {
+                        res.writeHead(200, {
+                            'Content-Type': 'text/html',
+                            'Set-Cookie': `username=${username}; path=/`
+                        });
                         handleFileResponse(res, pagina_main, "text/html");
                     } else {
                         console.log('Error al iniciar sesion')

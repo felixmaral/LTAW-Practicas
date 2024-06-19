@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="index.css">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <title>Temproove</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <title>Procesar Pedido</title>
 </head>
-
 <body>
     <header>
         <nav>
-            <img src="logo.jpg" class=logo-img alt="Logo Temproove">
+            <img src='logo.jpg' class="logo-img" alt="Logo Temproove">
             <div class="logo">
                 <h1>Temproove</h1>
             </div>
@@ -28,15 +26,31 @@
     </header>
 
     <main>
-        <section id="home" class="hero">
-            <div class="hero-content">
-                <h2>Bienvenido a Temproove</h2>
-                <p>Encuentra los mejores instrumentos al mejor precio</p>
-                <a href="#products" class="btn">Ver Productos</a>
-            </div>
+        <section class="form-section">
+            <h2>Procesar Pedido</h2>
+            <form action="/procesarPedido" method="get">
+                <div class="form-group">
+                    <label for="direccion">Dirección de Envío:</label>
+                    <input type="text" id="direccion" name="direccion" required>
+                </div>
+                <div class="form-group">
+                    <label for="tarjeta">Número de Tarjeta de Crédito:</label>
+                    <input type="text" id="tarjeta" name="tarjeta" required>
+                </div>
+                <button type="submit" class="btn">Finalizar Compra</button>
+            </form>
         </section>
+    </main>
 
-        
-    </body>
-    
-    </html>
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 Temproove. Todos los derechos reservados.</p>
+            <ul class="social-links">
+                <li><a href="#">Facebook</a></li>
+                <li><a href="#">Twitter</a></li>
+                <li><a href="#">Instagram</a></li>
+            </ul>
+        </div>
+    </footer>
+</body>
+</html>
