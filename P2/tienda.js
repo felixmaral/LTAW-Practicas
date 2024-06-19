@@ -8,7 +8,7 @@ const PUERTO = 9090;
 const pagina_main = './pages/index.html';
 const pagina_error = './pages/error.html';
 const pagina_login = './pages/login.html';
-const pagina_log_error = './pages/log_error.html'
+const pagina_log_error = './pages/log_error.html';
 
 const mimeTypes = {
     '.html': { type: 'text/html', folder: './pages' },
@@ -55,6 +55,7 @@ const server = http.createServer((req, res) => {
 
     const url = new URL(req.url, 'http://' + req.headers['host']);
     const pathname = url.pathname;
+    const searchParams = url.searchParams;
     console.log('Ruta:', pathname);
 
     if (req.method === 'GET') {
@@ -84,29 +85,10 @@ const server = http.createServer((req, res) => {
             `);
             console.log('Lista de archivos enviada');
         } else if (pathname === '/login') {
-            handleFileResponse(res, pagina_login, 'text/html');
-        } else {
-            const ext = path.extname(pathname);
-            const mimeInfo = mimeTypes[ext];
-            if (mimeInfo) {
-                const recurso = path.join(mimeInfo.folder, pathname);
-                handleFileResponse(res, recurso, mimeInfo.type);
-            } else {
-                handleFileResponse(res, pagina_error, 'text/html');
-            }
-        }
+            const username = searchParams.get('username');
+            const password = searchParams.get('password');
 
-    } else if (req.method === 'POST') {
-        if (pathname === '/login') {
-            let body = '';
-            req.on('data', chunk => {
-                body += chunk.toString();
-            });
-            req.on('end', () => {
-                console.log('Datos recibidos del formulario:', body);
-                const parsedBody = qs.parse(body);
-                const { username, password } = parsedBody;
-
+            if (username && password) {
                 fs.readFile('tienda.json', 'utf8', (err, data) => {
                     if (err) {
                         console.error('Error al leer el archivo JSON:', err);
@@ -129,15 +111,25 @@ const server = http.createServer((req, res) => {
                     const usuario = verificarCredenciales(username, password, jsonData.usuarios);
 
                     if (usuario) {
-                        handleFileResponse(res, pagina_main, "text/html")
-                        
+                        handleFileResponse(res, pagina_main, "text/html");
                     } else {
-                        handleFileResponse(res, pagina_log_error, 'text/html' )
+                        console.log('Error al iniciar sesion')
+                        handleFileResponse(res, pagina_login, 'text/html');
                     }
                 });
-            });
+            } else {
+                handleFileResponse(res, pagina_login, 'text/html');
+            }
+        } else {
+            const ext = path.extname(pathname);
+            const mimeInfo = mimeTypes[ext];
+            if (mimeInfo) {
+                const recurso = path.join(mimeInfo.folder, pathname);
+                handleFileResponse(res, recurso, mimeInfo.type);
+            } else {
+                handleFileResponse(res, pagina_error, 'text/html');
+            }
         }
-        
     } else {
         handleFileResponse(res, pagina_error, 'text/html');
     }
@@ -145,3 +137,4 @@ const server = http.createServer((req, res) => {
 
 server.listen(PUERTO);
 console.log("\n Servidor Activo en " + PUERTO + "\n");
+
