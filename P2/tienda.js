@@ -8,6 +8,7 @@ const PUERTO = 9090;
 const pagina_main = './pages/index.html';
 const pagina_error = './pages/error.html';
 const pagina_login = './pages/login.html';
+const pagina_log_error = './pages/log_error.html'
 
 const mimeTypes = {
     '.html': { type: 'text/html', folder: './pages' },
@@ -128,38 +129,10 @@ const server = http.createServer((req, res) => {
                     const usuario = verificarCredenciales(username, password, jsonData.usuarios);
 
                     if (usuario) {
-                        res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end(`
-                            <!DOCTYPE html>
-                            <html lang="es">
-                            <head>
-                                <meta charset="UTF-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>Login Exitoso</title>
-                            </head>
-                            <body>
-                                <h1>Login Exitoso</h1>
-                                <p>Bienvenido, ${usuario.nombreReal}</p>
-                            </body>
-                            </html>
-                        `);
+                        handleFileResponse(res, pagina_main, "text/html")
                         
                     } else {
-                        res.writeHead(401, { 'Content-Type': 'text/html' });
-                        res.end(`
-                            <!DOCTYPE html>
-                            <html lang="es">
-                            <head>
-                                <meta charset="UTF-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>Error de Login</title>
-                            </head>
-                            <body>
-                                <h1>Error de Login</h1>
-                                <p>Usuario o contraseña incorrectos</p>
-                            </body>
-                            </html>
-                        `);
+                        handleFileResponse(res, pagina_log_error, 'text/html' )
                     }
                 });
             });
