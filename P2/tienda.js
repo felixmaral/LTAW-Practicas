@@ -9,7 +9,7 @@ const pagina_error = './pages/error.html';
 const pagina_login = './pages/login.html';
 const pagina_log_ok = './pages/log_ok.html';
 const pagina_log_error = './pages/log_error.html';
-const pagina_add_cart = './pages/add-to-cart.html'
+const pagina_add_cart = './pages/add-to-cart.html';
 
 const mimeTypes = {
     '.html': { type: 'text/html', folder: './pages' },
@@ -62,6 +62,7 @@ const server = http.createServer((req, res) => {
     if (req.method === 'GET') {
         if (pathname === '/') {
             handleFileResponse(res, pagina_main, 'text/html');
+            return;
         } else if (pathname === '/ls') {
             let fileListHtml = '<ul>';
             fileListHtml += generateFileList('./pages');
@@ -85,6 +86,7 @@ const server = http.createServer((req, res) => {
                 </html>
             `);
             console.log('Lista de archivos enviada');
+            return;
         } else if (pathname === '/login') {
             const username = searchParams.get('username');
             const password = searchParams.get('password');
@@ -114,57 +116,65 @@ const server = http.createServer((req, res) => {
                     if (usuario) {
                         res.setHeader('Set-Cookie', `username_session=${username}; path=/`);
                         handleFileResponse(res, pagina_log_ok, "text/html");
+                        return;
                     } else {
                         console.log('Error al iniciar sesión');
                         handleFileResponse(res, pagina_log_error, 'text/html');
+                        return;
                     }
                 });
             } else {
                 handleFileResponse(res, pagina_login, 'text/html');
+                return;
             }
         } else if (pathname === '/add-to-cart') {
             const productId = searchParams.get('product');
             const cookies = req.headers.cookie;
 
-            const pares = cookies.split(';');
-            let cookie_names = [];
+            if (cookies) {
+                const pares = cookies.split(';');
+                let carritoEncontrado = false;
+                let carritoValor = "";
 
-            pares.forEach((element, index) => {
-                let [nombre, valor] = element.trim().split('=');
+                pares.forEach((element, index) => {
+                    let [nombre, valor] = element.trim().split('=');
 
-                if (nombre === 'username_session') {
-                    pares.forEach((element, index) => {
-                        let [nombre, valor] = element.trim().split('=');
+                    if (nombre === 'carrito') {
+                        carritoEncontrado = true;
+                        carritoValor = valor;
+                    }
+                });
 
-                        if (nombre === 'carrito') {
-                            res.setHeader('Set-Cookie', `carrito=${valor},${productId}; path=/`);
-                        }
-                    });
+                if (carritoEncontrado) {
+                    let carritoArray = carritoValor.split(',');
+                    if (!carritoArray.includes(productId)) {
+                        carritoArray.push(productId);
+                    }
+                    res.setHeader('Set-Cookie', `carrito=${carritoArray.join(',')}; path=/`);
                 } else {
-                    res.writeHead(200, { 'Content-Type': 'text/html' });
-                    res.end(`
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>File List</title>
-                        </head>
-                        <body>
-                            <h1>Necesitas Iniciar sesión para comprar</h1>
-                            <li><a id="profile" href="login.html">Entrar</a></li>
-                        </body>
-                        </html>
-                    `);
+                    res.setHeader('Set-Cookie', `carrito=${productId}; path=/`);
                 }
 
-                cookie_names.push(valor);
-
-                if (!cookie_names.includes('carrito')) {
-                    res.setHeader('Set-Cookie', `carrito=${valor}; path=/`);
-                    handleFileResponse(res, )
-                }
-            });
+                handleFileResponse(res, pagina_add_cart, 'text/html');
+                return;
+            } else {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(`
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>File List</title>
+                    </head>
+                    <body>
+                        <h1>Necesitas Iniciar sesión para comprar</h1>
+                        <li><a id="profile" href="login.html">Entrar</a></li>
+                    </body>
+                    </html>
+                `);
+                return;
+            }
         } else if (pathname === '/procesar') {
             // Código para procesar pedido
         } else {
@@ -173,12 +183,15 @@ const server = http.createServer((req, res) => {
             if (mimeInfo) {
                 const recurso = path.join(mimeInfo.folder, pathname);
                 handleFileResponse(res, recurso, mimeInfo.type);
+                return;
             } else {
                 handleFileResponse(res, pagina_error, 'text/html');
+                return;
             }
         }
     } else {
         handleFileResponse(res, pagina_error, 'text/html');
+        return;
     }
 });
 
