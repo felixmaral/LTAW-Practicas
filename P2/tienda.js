@@ -1,14 +1,15 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const qs = require('querystring');
 
 const PUERTO = 9090;
 
 const pagina_main = './pages/index.html';
 const pagina_error = './pages/error.html';
 const pagina_login = './pages/login.html';
-const pagina_procesar = './pages/procesar.html';
+const pagina_log_ok = './pages/log_ok.html';
+const pagina_log_error = './pages/log_error.html';
+const pagina_add_cart = './pages/add-to-cart.html'
 
 const mimeTypes = {
     '.html': { type: 'text/html', folder: './pages' },
@@ -112,68 +113,60 @@ const server = http.createServer((req, res) => {
 
                     if (usuario) {
                         res.setHeader('Set-Cookie', `username_session=${username}; path=/`);
-                        handleFileResponse(res, pagina_main, "text/html");
+                        handleFileResponse(res, pagina_log_ok, "text/html");
                     } else {
                         console.log('Error al iniciar sesión');
-                        handleFileResponse(res, pagina_login, 'text/html');
+                        handleFileResponse(res, pagina_log_error, 'text/html');
                     }
                 });
             } else {
                 handleFileResponse(res, pagina_login, 'text/html');
             }
-        } else if (pathname === '/procesar') {
-            const direccion = searchParams.get('direccion');
-            const tarjeta = searchParams.get('tarjeta');
+        } else if (pathname === '/add-to-cart') {
+            const productId = searchParams.get('product');
             const cookies = req.headers.cookie;
 
-            if (cookies) {
-                const cookieMap = Object.fromEntries(cookies.split('; ').map(c => c.split('=')));
-                const username = cookieMap['username'];
+            const pares = cookies.split(';');
+            let cookie_names = [];
 
-                fs.readFile('tienda.json', 'utf8', (err, data) => {
-                    if (err) {
-                        console.error('Error al leer el archivo JSON:', err);
-                        res.writeHead(500, { 'Content-Type': 'text/html' });
-                        res.end('Error interno del servidor');
-                        return;
-                    }
+            pares.forEach((element, index) => {
+                let [nombre, valor] = element.trim().split('=');
 
-                    let jsonData;
+                if (nombre === 'username_session') {
+                    pares.forEach((element, index) => {
+                        let [nombre, valor] = element.trim().split('=');
 
-                    try {
-                        jsonData = JSON.parse(data);
-                    } catch (parseErr) {
-                        console.error('Error al parsear el archivo JSON:', parseErr);
-                        res.writeHead(500, { 'Content-Type': 'text/html' });
-                        res.end('Error interno del servidor');
-                        return;
-                    }
-
-                    const nuevoPedido = {
-                        nombreUsuario: username,
-                        direccionEnvio: direccion,
-                        numeroTarjeta: tarjeta,
-                        productosComprados: []  // Añadir los productos comprados aquí
-                    };
-
-                    jsonData.pedidos.push(nuevoPedido);
-
-                    fs.writeFile('tienda.json', JSON.stringify(jsonData, null, 2), (err) => {
-                        if (err) {
-                            console.error('Error al escribir en el archivo JSON:', err);
-                            res.writeHead(500, { 'Content-Type': 'text/html' });
-                            res.end('Error interno del servidor');
-                            return;
+                        if (nombre === 'carrito') {
+                            res.setHeader('Set-Cookie', `carrito=${valor},${productId}; path=/`);
                         }
-
-                        res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end('Pedido procesado correctamente');
                     });
-                });
-            } else {
-                res.writeHead(400, { 'Content-Type': 'text/html' });
-                res.end('No hay usuario autenticado');
-            }
+                } else {
+                    res.writeHead(200, { 'Content-Type': 'text/html' });
+                    res.end(`
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>File List</title>
+                        </head>
+                        <body>
+                            <h1>Necesitas Iniciar sesión para comprar</h1>
+                            <li><a id="profile" href="login.html">Entrar</a></li>
+                        </body>
+                        </html>
+                    `);
+                }
+
+                cookie_names.push(valor);
+
+                if (!cookie_names.includes('carrito')) {
+                    res.setHeader('Set-Cookie', `carrito=${valor}; path=/`);
+                    handleFileResponse(res, )
+                }
+            });
+        } else if (pathname === '/procesar') {
+            // Código para procesar pedido
         } else {
             const ext = path.extname(pathname);
             const mimeInfo = mimeTypes[ext];
@@ -191,4 +184,3 @@ const server = http.createServer((req, res) => {
 
 server.listen(PUERTO);
 console.log("\nServidor Activo en " + PUERTO + "\n");
-

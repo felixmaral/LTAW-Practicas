@@ -15,12 +15,11 @@
                 <h1>Temproove</h1>
             </div>
             <ul class="nav-links">
+                <li><a id="profile" href="login.html">Entrar</a></li>
                 <li><a href="index.html">Inicio</a></li>
-                <li><a href="login.html">Entrar</a></li>
                 <li><a href="index.html#products">Productos</a></li>
                 <li><a href="procesar.html">Carrito</a></li>
-                <li>Sobre Nosotros</li>
-                <li>Contacto</li>
+                <li><a href="#" id="logout" style="display:none; font-size: small;" >Cerrar Sesión</a></li>
             </ul>
         </nav>
     </header>
@@ -52,5 +51,30 @@
             </ul>
         </div>
     </footer>
+
+    <script>
+        window.onload = function() {
+            const cookies = document.cookie.split(';');
+            let username = '';
+
+            cookies.forEach(cookie => {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'username_session') {
+                    username = value;
+                }
+            });
+
+            if (username) {
+                document.querySelector('#profile').textContent = username;
+                document.querySelector('#logout').style.display = 'block';
+            }
+
+            document.querySelector('#logout').addEventListener('click', function() {
+                document.cookie = 'username_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                document.cookie = 'carrito=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                location.reload();
+            });
+        };
+    </script>
 </body>
 </html>
