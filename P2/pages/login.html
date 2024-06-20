@@ -7,6 +7,25 @@
     <link rel="stylesheet" href="index.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <title>Login - Temproove</title>
+
+    <script>
+        window.onload = function() {
+            const cookies = document.cookie.split(';');
+            let username = '';
+    
+            cookies.forEach(cookie => {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'username_session') {
+                    username = value;
+                }
+            });
+    
+            if (username) {
+                document.querySelector('#profile').textContent = username;
+                document.querySelector('main').textContent = 'Ya has iniciado sesión'
+            }
+        };
+    </script>
 </head>
 
 <body>
