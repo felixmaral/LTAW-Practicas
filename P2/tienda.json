@@ -1,51 +1,50 @@
 {
-    "usuarios": [
-      {
-        "nombre": "root",
-        "password": "1234",
-        "nombreReal": "Admin",
-        "correo": "admin@example.com"
-      },
-      {
-        "nombre": "pepito",
-        "password": "1234",
-        "nombreReal": "Pepe",
-        "correo": "pepito1@example.com"
-      }
-    ],
-
-    "productos": [
-      {
-        "nombre": "Piano Hemingway",
-        "id": "1",
-        "descripcion": "Descripción del Producto1",
-        "precio": 499,
-        "cantidad": 10
-      },
-      {
-        "nombre": "Guitarra Electrica Red",
-        "id": "2",
-        "descripcion": "Descripción del Producto2",
-        "precio": 249,
-        "cantidad": 5
-      },
-      {
-        "nombre": "Violin Bernd Hiller",
-        "id": "3",
-        "descripcion": "Descripción del Producto2",
-        "precio": 9555,
-        "cantidad": 5
-      }
-    ],
-
-    "pedidos": [
-      {
-        "nombreUsuario": "root",
-        "direccionEnvio": "Calle Falsa 123",
-        "numeroTarjeta": "1234-5678-8765-4321",
-        "productosComprados": ["1", "2"]
-      }
-    ]
-
-  }
-  
+  "usuarios": [
+    {
+      "nombre": "root",
+      "password": "1234",
+      "nombreReal": "Admin",
+      "correo": "admin@example.com"
+    },
+    {
+      "nombre": "pepito",
+      "password": "1234",
+      "nombreReal": "Pepe",
+      "correo": "pepito1@example.com"
+    }
+  ],
+  "productos": [
+    {
+      "nombre": "Piano Hemingway",
+      "id": "1",
+      "descripcion": "Piano eléctrico con mueble",
+      "precio": 499,
+      "cantidad": 10
+    },
+    {
+      "nombre": "Guitarra Electrica Red",
+      "id": "2",
+      "descripcion": "Guitarra electrica activa, color Rojo",
+      "precio": 249,
+      "cantidad": 5
+    },
+    {
+      "nombre": "Violin Bernd Hiller",
+      "id": "3",
+      "descripcion": "Violin 4/4 acustico de alta calidad",
+      "precio": 9555,
+      "cantidad": 5
+    }
+  ],
+  "pedidos": [
+    {
+      "nombreUsuario": "root",
+      "direccionEnvio": "Calle Falsa 123",
+      "numeroTarjeta": "1234-5678-8765-4321",
+      "productosComprados": [
+        "1",
+        "2"
+      ]
+    }
+  ]
+}

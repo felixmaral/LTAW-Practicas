@@ -147,9 +147,7 @@ const server = http.createServer((req, res) => {
 
                 if (carritoEncontrado) {
                     let carritoArray = carritoValor.split(',');
-                    if (!carritoArray.includes(productId)) {
-                        carritoArray.push(productId);
-                    }
+                    carritoArray.push(productId);
                     res.setHeader('Set-Cookie', `carrito=${carritoArray.join(',')}; path=/`);
                 } else {
                     res.setHeader('Set-Cookie', `carrito=${productId}; path=/`);
@@ -176,54 +174,192 @@ const server = http.createServer((req, res) => {
                 `);
                 return;
             }
-        } else if (pathname === '/carrito') {
+        } else if (pathname === '/finalizar-compra') {
             const cookies = req.headers.cookie;
             let carritoValor = null;
-
+            let username = '';
+        
             if (cookies) {
                 const pares = cookies.split(';');
                 pares.forEach((element) => {
                     let [nombre, valor] = element.trim().split('=');
                     if (nombre === 'carrito') {
                         carritoValor = valor;
+                    } else if (nombre === 'username_session') {
+                        username = valor;
                     }
                 });
             }
-
-            if (carritoValor) {
-                const carritoArray = carritoValor.split(',');
-
-                fs.readFile('tienda.json', 'utf8', (err, data) => {
+        
+            if (!username) {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(`
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <link rel="stylesheet" href="index.css">
+                        <title>Necesitas Iniciar Sesión</title>
+                    </head>
+                    <body>
+                        <header>
+                            <nav>
+                                <img src="logo.jpg" class="logo-img" alt="Logo Temproove">
+                                <div class="logo">
+                                    <h1>Temproove</h1>
+                                </div>
+                                <ul class="nav-links">
+                                    <li><a id="profile" href="login.html">Entrar</a></li>
+                                    <li><a href="index.html">Inicio</a></li>
+                                    <li><a href="index.html#products">Productos</a></li>
+                                    <li><a href="carrito">Carrito</a></li>
+                                    <li><a href="#" id="logout" style="display:none; font-size: small;" >Cerrar Sesión</a></li>
+                                </ul>
+                            </nav>
+                        </header>
+                        <section id="home" class="hero">
+                            <div class="hero-content">
+                                <h1>Necesitas Iniciar Sesión</h1>
+                                <p>Debes iniciar sesión para finalizar la compra.</p>
+                            </div>
+                        </section>
+                        <script>
+                            window.onload = function() {
+                                const cookies = document.cookie.split(';');
+                                let username = '';
+        
+                                cookies.forEach(cookie => {
+                                    const [name, value] = cookie.trim().split('=');
+                                    if (name === 'username_session') {
+                                        username = value;
+                                    }
+                                });
+        
+                                if (username) {
+                                    document.querySelector('#profile').textContent = username;
+                                    document.querySelector('#logout').style.display = 'block';
+                                }
+        
+                                document.querySelector('#logout').addEventListener('click', function() {
+                                    document.cookie = 'username_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                    document.cookie = 'carrito=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                    location.reload();
+                                });
+                            };
+                        </script>
+                    </body>
+                    </html>
+                `);
+                return;
+            }
+        
+            if (!carritoValor) {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(`
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <link rel="stylesheet" href="index.css">
+                        <title>Error - Finalizar Compra</title>
+                    </head>
+                    <body>
+                        <header>
+                            <nav>
+                                <img src="logo.jpg" class="logo-img" alt="Logo Temproove">
+                                <div class="logo">
+                                    <h1>Temproove</h1>
+                                </div>
+                                <ul class="nav-links">
+                                    <li><a id="profile" href="login.html">Entrar</a></li>
+                                    <li><a href="index.html">Inicio</a></li>
+                                    <li><a href="index.html#products">Productos</a></li>
+                                    <li><a href="carrito">Carrito</a></li>
+                                    <li><a href="#" id="logout" style="display:none; font-size: small;" >Cerrar Sesión</a></li>
+                                </ul>
+                            </nav>
+                        </header>
+                        <section id="home" class="hero">
+                            <div class="hero-content">
+                                <h1>Error al finalizar compra</h1>
+                                <p>No se encontró ningún producto en el carrito.</p>
+                            </div>
+                        </section>
+                        <script>
+                            window.onload = function() {
+                                const cookies = document.cookie.split(';');
+                                let username = '';
+        
+                                cookies.forEach(cookie => {
+                                    const [name, value] = cookie.trim().split('=');
+                                    if (name === 'username_session') {
+                                        username = value;
+                                    }
+                                });
+        
+                                if (username) {
+                                    document.querySelector('#profile').textContent = username;
+                                    document.querySelector('#logout').style.display = 'block';
+                                }
+        
+                                document.querySelector('#logout').addEventListener('click', function() {
+                                    document.cookie = 'username_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                    document.cookie = 'carrito=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                    location.reload();
+                                });
+                            };
+                        </script>
+                    </body>
+                    </html>
+                `);
+                return;
+            }
+        
+            const carritoArray = carritoValor.split(',');
+            const productoContador = carritoArray.reduce((contador, productoId) => {
+                contador[productoId] = (contador[productoId] || 0) + 1;
+                return contador;
+            }, {});
+        
+            fs.readFile('tienda.json', 'utf8', (err, data) => {
+                if (err) {
+                    console.error('Error al leer el archivo JSON:', err);
+                    res.writeHead(500, { 'Content-Type': 'text/html' });
+                    res.end('Error interno del servidor');
+                    return;
+                }
+        
+                let jsonData;
+        
+                try {
+                    jsonData = JSON.parse(data);
+                } catch (parseErr) {
+                    console.error('Error al parsear el archivo JSON:', parseErr);
+                    res.writeHead(500, { 'Content-Type': 'text/html' });
+                    res.end('Error interno del servidor');
+                    return;
+                }
+        
+                const productosCarrito = jsonData.productos.filter(producto => carritoArray.includes(producto.id));
+                const pedido = {
+                    nombreUsuario: username,
+                    direccionEnvio: searchParams.get('direccion'),
+                    numeroTarjeta: searchParams.get('tarjeta'),
+                    productosComprados: productosCarrito.map(producto => producto.id)
+                };
+        
+                jsonData.pedidos.push(pedido);
+        
+                fs.writeFile('tienda.json', JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
                     if (err) {
-                        console.error('Error al leer el archivo JSON:', err);
+                        console.error('Error al escribir en el archivo JSON:', err);
                         res.writeHead(500, { 'Content-Type': 'text/html' });
                         res.end('Error interno del servidor');
                         return;
                     }
-
-                    let jsonData;
-
-                    try {
-                        jsonData = JSON.parse(data);
-                    } catch (parseErr) {
-                        console.error('Error al parsear el archivo JSON:', parseErr);
-                        res.writeHead(500, { 'Content-Type': 'text/html' });
-                        res.end('Error interno del servidor');
-                        return;
-                    }
-
-                    const productosCarrito = jsonData.productos.filter(producto => carritoArray.includes(producto.id));
-                    let html = '<ul>';
-                    let price_total = 0;
-                    let price = '<p>';
-                    productosCarrito.forEach(producto => {
-                        html += `<li>${producto.nombre} - $${producto.precio}</li>`;
-                        price_total += parseInt(producto.precio)
-                    });
-
-                    price += `Total: $ ${price_total} </p>`
-                    html += '</ul>';
-
+        
                     res.writeHead(200, { 'Content-Type': 'text/html' });
                     res.end(`
                         <!DOCTYPE html>
@@ -232,12 +368,12 @@ const server = http.createServer((req, res) => {
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
                             <link rel="stylesheet" href="index.css">
-                            <title>Carrito de Compras</title>
+                            <title>Compra Finalizada</title>
                         </head>
                         <body>
-                        <header>
+                            <header>
                                 <nav>
-                                    <img src="logo.jpg" class=logo-img alt="Logo Temproove">
+                                    <img src="logo.jpg" class="logo-img" alt="Logo Temproove">
                                     <div class="logo">
                                         <h1>Temproove</h1>
                                     </div>
@@ -249,48 +385,161 @@ const server = http.createServer((req, res) => {
                                         <li><a href="#" id="logout" style="display:none; font-size: small;" >Cerrar Sesión</a></li>
                                     </ul>
                                 </nav>
-                        </header>
-                        <section id="home" class="hero">
-                            <div class="hero-content">
-                                <h1>Carrito de Compras</h1>
-                                ${html}
-                                ${price}
-                                <button id="delete-cookie">Eliminar Carrito</button>
-                            </div>
-                        </section>
-                       
-                        <script>
-                            document.getElementById('delete-cookie').addEventListener('click', () => {
-                                document.cookie = 'carrito=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                                location.reload();
-                            });
-                        </script>
-
-                        <script>
-                window.onload = function() {
-                const cookies = document.cookie.split(';');
-                let username = '';
-    
-                cookies.forEach(cookie => {
-                    const [name, value] = cookie.trim().split('=');
-                    if (name === 'username_session') {
-                        username = value;
+                            </header>
+                            <section id="home" class="hero">
+                                <div class="hero-content">
+                                    <h1>Compra Finalizada</h1>
+                                    <p>¡Gracias por tu compra!</p>
+                                </div>
+                            </section>
+                            <script>
+                                window.onload = function() {
+                                    const cookies = document.cookie.split(';');
+                                    let username = '';
+        
+                                    cookies.forEach(cookie => {
+                                        const [name, value] = cookie.trim().split('=');
+                                        if (name === 'username_session') {
+                                            username = value;
+                                        }
+                                    });
+        
+                                    if (username) {
+                                        document.querySelector('#profile').textContent = username;
+                                        document.querySelector('#logout').style.display = 'block';
+                                    }
+        
+                                    document.querySelector('#logout').addEventListener('click', function() {
+                                        document.cookie = 'username_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                        document.cookie = 'carrito=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                        location.reload();
+                                    });
+                                };
+                            </script>
+                        </body>
+                        </html>
+                    `);
+                });
+            });
+                    
+        } else if (pathname === '/carrito') {
+            const cookies = req.headers.cookie;
+            let carritoValor = null;
+        
+            if (cookies) {
+                const pares = cookies.split(';');
+                pares.forEach((element) => {
+                    let [nombre, valor] = element.trim().split('=');
+                    if (nombre === 'carrito') {
+                        carritoValor = valor;
                     }
                 });
-    
-                if (username) {
-                document.querySelector('#profile').textContent = username;
-                document.querySelector('#logout').style.display = 'block';
-                }
-    
-                document.querySelector('#logout').addEventListener('click', function() {
-                    document.cookie = 'username_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-                    document.cookie = 'carrito=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-                    location.reload();
-                });
-                };
-                 </script>
-                    </body>
+            }
+        
+            if (carritoValor) {
+                const carritoArray = carritoValor.split(',');
+                const productoContador = carritoArray.reduce((contador, productoId) => {
+                    contador[productoId] = (contador[productoId] || 0) + 1;
+                    return contador;
+                }, {});
+        
+                fs.readFile('tienda.json', 'utf8', (err, data) => {
+                    if (err) {
+                        console.error('Error al leer el archivo JSON:', err);
+                        res.writeHead(500, { 'Content-Type': 'text/html' });
+                        res.end('Error interno del servidor');
+                        return;
+                    }
+        
+                    let jsonData;
+        
+                    try {
+                        jsonData = JSON.parse(data);
+                    } catch (parseErr) {
+                        console.error('Error al parsear el archivo JSON:', parseErr);
+                        res.writeHead(500, { 'Content-Type': 'text/html' });
+                        res.end('Error interno del servidor');
+                        return;
+                    }
+        
+                    const productosCarrito = jsonData.productos.filter(producto => carritoArray.includes(producto.id));
+                    let html = '<ul>';
+                    let price_total = 0;
+                    productosCarrito.forEach(producto => {
+                        const cantidad = productoContador[producto.id] || 0;
+                        html += `<li>${producto.nombre} - $${producto.precio} x${cantidad}</li>`;
+                        price_total += producto.precio * cantidad;
+                    });
+                    html += '</ul>';
+                    html += `<p>Total: $${price_total}</p>`;
+        
+                    html += `
+                        <form id="finalizar-compra" method="GET" action="/finalizar-compra">
+                            <label for="direccion">Dirección de Envío:</label><br>
+                            <input type="text" id="direccion" name="direccion" required><br><br>
+                            <label for="tarjeta">Número de Tarjeta:</label><br>
+                            <input type="text" id="tarjeta" name="tarjeta" required><br><br>
+                            <input type="submit" value="Finalizar Compra">
+                        </form>
+                    `;
+        
+                    res.writeHead(200, { 'Content-Type': 'text/html' });
+                    res.end(`
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <link rel="stylesheet" href="index.css">
+                            <title>Carrito de Compras</title>
+                        </head>
+                        <body>
+                            <header>
+                                <nav>
+                                    <img src="logo.jpg" class="logo-img" alt="Logo Temproove">
+                                    <div class="logo">
+                                        <h1>Temproove</h1>
+                                    </div>
+                                    <ul class="nav-links">
+                                        <li><a id="profile" href="login.html">Entrar</a></li>
+                                        <li><a href="index.html">Inicio</a></li>
+                                        <li><a href="index.html#products">Productos</a></li>
+                                        <li><a href="carrito">Carrito</a></li>
+                                        <li><a href="#" id="logout" style="display:none; font-size: small;" >Cerrar Sesión</a></li>
+                                    </ul>
+                                </nav>
+                            </header>
+                            <section id="home" class="hero">
+                                <div class="hero-content">
+                                    <h1>Carrito de Compras</h1>
+                                    ${html}
+                                </div>
+                            </section>
+                            <script>
+                                window.onload = function() {
+                                    const cookies = document.cookie.split(';');
+                                    let username = '';
+        
+                                    cookies.forEach(cookie => {
+                                        const [name, value] = cookie.trim().split('=');
+                                        if (name === 'username_session') {
+                                            username = value;
+                                        }
+                                    });
+        
+                                    if (username) {
+                                        document.querySelector('#profile').textContent = username;
+                                        document.querySelector('#logout').style.display = 'block';
+                                    }
+        
+                                    document.querySelector('#logout').addEventListener('click', function() {
+                                        document.cookie = 'username_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                        document.cookie = 'carrito=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                        location.reload();
+                                    });
+                                };
+                            </script>
+                        </body>
                         </html>
                     `);
                 });
@@ -307,64 +556,57 @@ const server = http.createServer((req, res) => {
                         <title>Carrito de Compras</title>
                     </head>
                     <body>
-                    <header>
-        <nav>
-            <img src="logo.jpg" class=logo-img alt="Logo Temproove">
-            <div class="logo">
-                <h1>Temproove</h1>
-            </div>
-            <ul class="nav-links">
-                <li><a id="profile" href="login.html">Entrar</a></li>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="index.html#products">Productos</a></li>
-                <li><a href="carrito">Carrito</a></li>
-                <li><a href="#" id="logout" style="display:none; font-size: small;" >Cerrar Sesión</a></li>
-            </ul>
-        </nav>
-    </header>
-    <section id="home" class="hero">
-            <div class="hero-content">
-            <h1>Carrito de Compras</h1>
-            <p>No hay productos en el carrito.</p>
-            <button id="delete-cookie">Borrar Carrito</button>
-            </div>
-    </section>
-
-    <script>
-            window.onload = function() {
-                const cookies = document.cookie.split(';');
-                let username = '';
-    
-                cookies.forEach(cookie => {
-                    const [name, value] = cookie.trim().split('=');
-                    if (name === 'username_session') {
-                        username = value;
-                    }
-                });
-    
-                if (username) {
-                document.querySelector('#profile').textContent = username;
-                document.querySelector('#logout').style.display = 'block';
-            }
-    
-                document.querySelector('#logout').addEventListener('click', function() {
-                    document.cookie = 'username_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-                    document.cookie = 'carrito=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-                    location.reload();
-                });
-            };
-        </script>
+                        <header>
+                            <nav>
+                                <img src="logo.jpg" class="logo-img" alt="Logo Temproove">
+                                <div class="logo">
+                                    <h1>Temproove</h1>
+                                </div>
+                                <ul class="nav-links">
+                                    <li><a id="profile" href="login.html">Entrar</a></li>
+                                    <li><a href="index.html">Inicio</a></li>
+                                    <li><a href="index.html#products">Productos</a></li>
+                                    <li><a href="carrito">Carrito</a></li>
+                                    <li><a href="#" id="logout" style="display:none; font-size: small;" >Cerrar Sesión</a></li>
+                                </ul>
+                            </nav>
+                        </header>
+                        <section id="home" class="hero">
+                            <div class="hero-content">
+                                <h1>Carrito de Compras</h1>
+                                <p>No hay productos en el carrito.</p>
+                            </div>
+                        </section>
                         <script>
-                            document.getElementById('delete-cookie').addEventListener('click', () => {
-                                document.cookie = 'carrito=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                                location.reload();
-                            });
+                            window.onload = function() {
+                                const cookies = document.cookie.split(';');
+                                let username = '';
+        
+                                cookies.forEach(cookie => {
+                                    const [name, value] = cookie.trim().split('=');
+                                    if (name === 'username_session') {
+                                        username = value;
+                                    }
+                                });
+        
+                                if (username) {
+                                    document.querySelector('#profile').textContent = username;
+                                    document.querySelector('#logout').style.display = 'block';
+                                }
+        
+                                document.querySelector('#logout').addEventListener('click', function() {
+                                    document.cookie = 'username_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                    document.cookie = 'carrito=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                                    location.reload();
+                                });
+                            };
                         </script>
                     </body>
                     </html>
                 `);
                 return;
             }
+        
         } else {
             const ext = path.extname(pathname);
             const mimeInfo = mimeTypes[ext];
