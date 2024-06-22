@@ -19,21 +19,21 @@
         "nombre": "Piano Hemingway",
         "id": "1",
         "descripcion": "Descripción del Producto1",
-        "precio": 100,
+        "precio": 499,
         "cantidad": 10
       },
       {
         "nombre": "Guitarra Electrica Red",
         "id": "2",
         "descripcion": "Descripción del Producto2",
-        "precio": 200,
+        "precio": 249,
         "cantidad": 5
       },
       {
         "nombre": "Violin Bernd Hiller",
         "id": "3",
         "descripcion": "Descripción del Producto2",
-        "precio": 200,
+        "precio": 9555,
         "cantidad": 5
       }
     ],
