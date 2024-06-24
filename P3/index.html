@@ -8,7 +8,8 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const socket = io();
+      const socket = io(); // El cliente intentará conectarse al servidor en el mismo host y puerto
+
       let nickname = '';
 
       const joinChat = () => {
@@ -23,13 +24,17 @@
 
       socket.on('message', (data) => {
         const { nickname, message } = data;
+        displayMessage(`${nickname}: ${message}`);
+      });
+
+      const displayMessage = (message) => {
         const messages = document.getElementById('messages');
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('message');
-        messageContainer.innerHTML = `<strong>${nickname}:</strong> ${message}`;
+        messageContainer.innerHTML = message;
         messages.appendChild(messageContainer);
         messages.scrollTop = messages.scrollHeight; // Scroll automático al final
-      });
+      };
 
       const form = document.getElementById('form');
       form.addEventListener('submit', (e) => {
@@ -53,3 +58,4 @@
   </div>
 </body>
 </html>
+
