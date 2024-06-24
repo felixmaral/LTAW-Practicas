@@ -8,7 +8,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const socket = io(); // El cliente intentará conectarse al servidor en el mismo host y puerto
+      const socket = io();
 
       let nickname = '';
 
@@ -25,6 +25,10 @@
       socket.on('message', (data) => {
         const { nickname, message } = data;
         displayMessage(`${nickname}: ${message}`);
+      });
+
+      socket.on('userCount', (count) => {
+        document.getElementById('userCount').textContent = `Usuarios conectados: ${count}`;
       });
 
       const displayMessage = (message) => {
@@ -50,12 +54,12 @@
 </head>
 <body>
   <div class="chat-container">
+    <div id="userCount" class="user-count">Usuarios conectados: 0</div>
     <div id="messages" class="messages"></div>
     <form id="form" class="form">
-      <input id="input" autocomplete="off" class="input">
+      <input id="input" autocomplete="off" class="input" placeholder="Escribe tu mensaje...">
       <button class="button">Enviar</button>
     </form>
   </div>
 </body>
 </html>
-
