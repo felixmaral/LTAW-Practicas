@@ -1,3 +1,5 @@
+// server.js
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -15,6 +17,7 @@ io.on('connection', (socket) => {
 
   socket.on('join', (nickname) => {
     socket.nickname = nickname;
+    socket.emit('message', { nickname: 'Servidor', message: `Bienvenido al chat, ${nickname}!` });
     socket.broadcast.emit('message', { nickname: 'Servidor', message: `${nickname} se ha unido al chat` });
   });
 

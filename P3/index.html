@@ -8,7 +8,8 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const socket = io();
+      const socket = io('http://direccion-ip-del-servidor:puerto'); // Cambia por la IP y puerto correctos
+
       let nickname = '';
 
       const joinChat = () => {
@@ -53,3 +54,4 @@
   </div>
 </body>
 </html>
+
