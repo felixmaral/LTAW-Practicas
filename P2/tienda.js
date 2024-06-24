@@ -129,51 +129,35 @@ const server = http.createServer((req, res) => {
             }
         } else if (pathname === '/add-to-cart') {
             const productId = searchParams.get('product');
-            const cookies = req.headers.cookie;
-
-            if (cookies) {
-                const pares = cookies.split(';');
-                let carritoEncontrado = false;
-                let carritoValor = "";
-
-                pares.forEach((element, index) => {
-                    let [nombre, valor] = element.trim().split('=');
-
-                    if (nombre === 'carrito') {
-                        carritoEncontrado = true;
-                        carritoValor = valor;
-                    }
-                });
-
-                if (carritoEncontrado) {
-                    let carritoArray = carritoValor.split(',');
-                    carritoArray.push(productId);
-                    res.setHeader('Set-Cookie', `carrito=${carritoArray.join(',')}; path=/`);
-                } else {
-                    res.setHeader('Set-Cookie', `carrito=${productId}; path=/`);
+            const cookies = req.headers.cookie || '';
+        
+            let carritoValor = '';
+        
+            // Busca la cookie 'carrito' y obtiene su valor
+            const pares = cookies.split(';');
+            pares.forEach((element) => {
+                let [nombre, valor] = element.trim().split('=');
+                if (nombre === 'carrito') {
+                    carritoValor = valor;
                 }
-
-                handleFileResponse(res, pagina_add_cart, 'text/html');
-                return;
-            } else {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.end(`
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <link rel="stylesheet" href="index.css">
-                        <title>File List</title>
-                    </head>
-                    <body>
-                        <h1>Necesitas Iniciar sesión para comprar</h1>
-                        <li><a id="profile" href="login.html">Entrar</a></li>
-                    </body>
-                    </html>
-                `);
-                return;
+            });
+        
+            // Convierte el valor de la cookie en un arreglo
+            let carritoArray = carritoValor ? carritoValor.split(',') : [];
+        
+            // Verifica si el producto ya está en el carrito antes de añadirlo
+            if (!carritoArray.includes(productId)) {
+                carritoArray.push(productId);
             }
+        
+            // Actualiza la cookie 'carrito'
+            const nuevoCarritoValor = carritoArray.join(',');
+            res.setHeader('Set-Cookie', `carrito=${nuevoCarritoValor}; path=/`);
+        
+            // Envía la respuesta de la página de añadir al carrito
+            handleFileResponse(res, pagina_add_cart, 'text/html');
+            return;
+        
         } else if (pathname === '/finalizar-compra') {
             const cookies = req.headers.cookie;
             let carritoValor = null;
