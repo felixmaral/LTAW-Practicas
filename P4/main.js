@@ -1,25 +1,27 @@
+const electron = require('electron');
+const { app, BrowserWindow } = electron;
+const path = require('path');
+const url = require('url');
 const socket = require('socket.io');
 const http = require('http');
 const express = require('express');
-const colors = require('colors');
-const electron = require('electron');  
-const ip = require('ip');   
+const ip = require('ip');
 
 const PORT = 9090;
 
 // Crear app Express
-const app = express();
+const appExpress = express();
 
 // Crear Servidor a partir de la App express con el modulo http
-const server = http.Server(app);
+const server = http.createServer(appExpress);
 
 // Crear websocket
-const io = socket(server)
+const io = socket(server);
 
 //-- WebSocket
-const connectedUsers = new Map(); // Nuevo objeto Map para guardar (clave:valor) de socketID y nickname
+const connectedUsers = new Map();
 
-app.use(express.static(__dirname));
+appExpress.use(express.static(__dirname));
 
 io.on('connection', (socket) => {
   console.log('Nuevo usuario conectado');
@@ -77,12 +79,46 @@ io.on('connection', (socket) => {
   };
 });
 
-//-- Electron
+let mainWindow;
 
-let win = null;
+app.on('ready', () => {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
 
+  // Cargar la interfaz gráfica desde el servidor Socket.io
+  mainWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'index.html'),
+    protocol: 'file:',
+    slashes: true
+  }));
 
-server.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
+  mainWindow.webContents.openDevTools(); // Abre las herramientas de desarrollo
+
+  // Conectar con el servidor Socket.io en el lado del cliente
+  const socketClient = require('socket.io-client');
+  const socket = socketClient(`http://localhost:${PORT}`);
+
+  socket.on('connect', () => {
+    console.log('Conectado al servidor Socket.io');
+  });
+
+  socket.on('message', (data) => {
+    const { nickname, message } = data;
+    // Aquí puedes manejar los mensajes recibidos del servidor Socket.io
+    console.log(`${nickname}: ${message}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Desconectado del servidor Socket.io');
+  });
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 });
-
