@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com">
   <title>Chat de Electron</title>
 </head>
 <body>
@@ -13,26 +13,10 @@
     <button type="submit">Enviar</button>
   </form>
 
+  <!-- Incluir el script de Socket.io desde un CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
-  <script>
-    const socket = io(`http://localhost:9090`);
-
-    socket.on('message', (data) => {
-      const { nickname, message } = data;
-      const messageElement = document.createElement('div');
-      messageElement.innerHTML = `<strong>${nickname}:</strong> ${message}`;
-      document.getElementById('messages').appendChild(messageElement);
-    });
-
-    document.getElementById('message-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const messageInput = document.getElementById('message-input');
-      const message = messageInput.value.trim();
-      if (message !== '') {
-        socket.emit('message', message);
-        messageInput.value = '';
-      }
-    });
-  </script>
+  <!-- Incluir tu script personalizado para el cliente Socket.io -->
+  <script src="client.js"></script>
 </body>
 </html>
+
