@@ -3,20 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';" />
   <title>Chat de Electron</title>
 </head>
 <body>
-  <div id="messages"></div>
-  <form id="message-form">
-    <input type="text" id="message-input" placeholder="Escribe un mensaje...">
-    <button type="submit">Enviar</button>
-  </form>
+  <h1>Chat App</h1>
+  <div id="chat"></div>
+  <input type="text" id="message" placeholder="Escribe un mensaje...">
+  <div id="userCount">Usuarios conectados: 0</div>
+  <div id="appInfo"></div>
+  <button id="testMessageButton">Enviar mensaje de prueba</button>
 
-  <!-- Incluir el script de Socket.io desde un CDN -->
+  <div id="usernameModal" class="modal">
+    <div class="modal-content">
+      <h2>Ingrese su nombre de usuario</h2>
+      <input type="text" id="usernameInput" placeholder="Nombre de usuario">
+      <button id="submitUsername">Entrar</button>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
-  <!-- Incluir tu script personalizado para el cliente Socket.io -->
-  <script src="client.js"></script>
+  <script>
+    const socket = io(`http://localhost:9090`);
+
+    socket.on('message', (data) => {
+      const { nickname, message } = data;
+      const messageElement = document.createElement('div');
+      messageElement.innerHTML = `<strong>${nickname}:</strong> ${message}`;
+      document.getElementById('messages').appendChild(messageElement);
+    });
+
+    document.getElementById('message-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const messageInput = document.getElementById('message-input');
+      const message = messageInput.value.trim();
+      if (message !== '') {
+        socket.emit('message', message);
+        messageInput.value = '';
+      }
+    });
+  </script>
 </body>
 </html>
 
