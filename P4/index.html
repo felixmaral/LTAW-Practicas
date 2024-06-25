@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Chat Server Information</h1>
+    <div id="info">
+      <p>Node Version: <span id="node-version"></span></p>
+      <p>Electron Version: <span id="electron-version"></span></p>
+      <p>Chrome Version: <span id="chrome-version"></span></p>
+      <p>URL: <span id="url"></span></p>
+    </div>
+    <div>
+      <h2>Messages</h2>
+      <div id="messages"></div>
+    </div>
+    <button id="test-button">Send Test Message</button>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
