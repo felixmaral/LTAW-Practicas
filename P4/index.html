@@ -7,146 +7,69 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      margin: 20px;
     }
-
-    .chat-container {
-      width: 400px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .info {
-      background-color: #007bff;
-      color: white;
-      padding: 10px;
-    }
-
-    .user-count {
-      background-color: #007bff;
-      color: white;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .messages {
-      flex: 1;
-      padding: 10px;
+    #messages {
+      margin-bottom: 20px;
+      max-height: 300px;
       overflow-y: scroll;
-      border-top: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .message {
-      padding: 5px;
-      margin-bottom: 5px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .form {
-      display: flex;
-      border-top: 1px solid #ddd;
-    }
-
-    .input {
-      flex: 1;
-      border: none;
+      border: 1px solid #ccc;
       padding: 10px;
-      font-size: 16px;
     }
-
-    .button {
-      border: none;
+    form {
+      display: flex;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+    }
+    input[type="submit"] {
       padding: 10px 20px;
       background-color: #007bff;
       color: white;
+      border: none;
       cursor: pointer;
     }
-
-    .button:hover {
-      background-color: #0056b3;
-    }
   </style>
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const { ipcRenderer } = require('electron');
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const socket = io();
-
-      let nickname = '';
-
-      const joinChat = () => {
-        nickname = prompt('Ingresa tu nickname:');
-        if (!nickname) {
-          nickname = 'Invitado';
-        }
-        socket.emit('join', nickname);
-      };
-
-      joinChat();
-
-      socket.on('message', (data) => {
-        const { nickname, message } = data;
-        displayMessage(`${nickname}: ${message}`);
-      });
-
-      socket.on('userCount', (count) => {
-        document.getElementById('userCount').textContent = `Usuarios conectados: ${count}`;
-      });
-
-      const displayMessage = (message) => {
-        const messages = document.getElementById('messages');
-        const messageContainer = document.createElement('div');
-        messageContainer.classList.add('message');
-        messageContainer.innerHTML = message;
-        messages.appendChild(messageContainer);
-        messages.scrollTop = messages.scrollHeight;
-      };
-
-      const form = document.getElementById('form');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const input = document.getElementById('input');
-        if (input.value) {
-          socket.emit('message', input.value);
-          input.value = '';
-        }
-      });
-
-      ipcRenderer.on('server-started', (event, data) => {
-        document.getElementById('node-version').textContent = `Node: ${data.nodeVersion}`;
-        document.getElementById('electron-version').textContent = `Electron: ${data.electronVersion}`;
-        document.getElementById('chrome-version').textContent = `Chrome: ${data.chromeVersion}`;
-        document.getElementById('server-url').textContent = `URL: ${data.serverUrl}`;
-      });
-    });
-  </script>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="info">
-      <div id="node-version"></div>
-      <div id="electron-version"></div>
-      <div id="chrome-version"></div>
-      <div id="server-url"></div>
-    </div>
-    <div id="userCount" class="user-count">Usuarios conectados: 0</div>
-    <div id="messages" class="messages"></div>
-    <form id="form" class="form">
-      <input id="input" autocomplete="off" class="input" placeholder="Escribe tu mensaje...">
-      <button class="button">Enviar</button>
-    </form>
-  </div>
+  <h1>Chat App</h1>
+
+  <div id="messages"></div>
+
+  <form id="message-form">
+    <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
+    <input type="submit" value="Enviar">
+  </form>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    socket.on('connect', () => {
+      const nickname = prompt('Ingresa tu nickname:');
+      socket.emit('join', nickname);
+    });
+
+    const form = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const messagesDiv = document.getElementById('messages');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const message = messageInput.value.trim();
+      if (message !== '') {
+        socket.emit('message', message);
+        messageInput.value = '';
+      }
+    });
+
+    socket.on('message', (data) => {
+      const { nickname, message } = data;
+      const messageElement = document.createElement('p');
+      messageElement.innerHTML = `<strong>${nickname}:</strong> ${message}`;
+      messagesDiv.appendChild(messageElement);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+  </script>
 </body>
 </html>

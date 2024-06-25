@@ -7,7 +7,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const PORT = process.env.PORT || 3000;
-const connectedUsers = new Map();
+const connectedUsers = new Map(); // Nuevo objeto Map para guardar (clave:valor) de socketID y nickname
 
 app.use(express.static(__dirname));
 
@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
     connectedUsers.set(socket.id, nickname);
     socket.emit('message', { nickname: 'Servidor', message: `¡Bienvenido al chat, ${nickname}!` });
     socket.broadcast.emit('message', { nickname: 'Servidor', message: `${nickname} se ha unido al chat` });
-    io.emit('userCount', connectedUsers.size); // Enviar número de usuarios conectados a todos los clientes
+    io.emit('userCount', connectedUsers.size); // Actualizar el número de usuarios conectados
   });
 
   socket.on('message', (message) => {
