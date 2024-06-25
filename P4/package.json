@@ -4,14 +4,13 @@
     "description": "Electron Chat application",
     "main": "main.js",
     "scripts": {
-      "start": "electron ."
+        "start": "electron ."
     },
     "dependencies": {
-      "express": "^4.17.1",
-      "socket.io": "^4.0.0"
+        "express": "^4.19.2",
+        "socket.io": "^4.7.5"
     },
     "devDependencies": {
-      "electron": "^13.1.7"
+        "electron": "^13.6.9"
     }
-  }
-  
+}
