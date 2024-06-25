@@ -45,24 +45,6 @@
         "1",
         "2"
       ]
-    },
-    {
-      "nombreUsuario": "root",
-      "direccionEnvio": "123",
-      "numeroTarjeta": "123",
-      "productosComprados": [
-        "1",
-        "3"
-      ]
-    },
-    {
-      "nombreUsuario": "root",
-      "direccionEnvio": "123",
-      "numeroTarjeta": "123",
-      "productosComprados": [
-        "1",
-        "3"
-      ]
     }
   ]
 }

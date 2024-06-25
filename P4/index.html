@@ -118,6 +118,18 @@
     .button:hover {
       background-color: #d85445;
     }
+
+    .qr-code-container {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      background-color: #16a085;
+    }
+
+    .qr-code-container img {
+      width: 150px;
+      height: 150px;
+    }
   </style>
 </head>
 <body>
@@ -128,6 +140,9 @@
     <div class="form">
       <input type="text" id="message" class="input" placeholder="Escribe un mensaje...">
       <button id="testMessageButton" class="button">Enviar Prueba</button>
+    </div>
+    <div class="qr-code-container">
+      <img id="qrCode" src="" alt="QR Code">
     </div>
   </div>
 
@@ -140,6 +155,7 @@
   </div>
 
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
   <script>
     const { ipcRenderer } = require('electron');
     const chat = document.getElementById('chat');
@@ -150,6 +166,7 @@
     const usernameInput = document.getElementById('usernameInput');
     const submitUsername = document.getElementById('submitUsername');
     const testMessageButton = document.getElementById('testMessageButton');
+    const qrCodeImg = document.getElementById('qrCode');
     let nickname;
     let socket;
 
@@ -161,6 +178,12 @@
         <p>Electron: ${info.electronVersion}</p>
         <p>URL: <a href="${info.serverUrl}" target="_blank">${info.serverUrl}</a></p>
       `;
+
+      // Generar código QR
+      QRCode.toDataURL(info.serverUrl, { width: 150, height: 150 }, (err, url) => {
+        if (err) console.error(err);
+        qrCodeImg.src = url;
+      });
     });
 
     // Mostrar el modal para el nombre de usuario
