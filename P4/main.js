@@ -1,36 +1,115 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const os = require('os');
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
 const ip = require('ip');
 
+let mainWindow;
+let server;
+
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: true
     }
   });
 
-  win.loadFile('index.html');
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  // Open the DevTools.
-  // win.webContents.openDevTools();
-
-  // Send versions info to renderer process
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('versions', {
-      node: process.versions.node,
-      chrome: process.versions.chrome,
-      electron: process.versions.electron,
-      url: `http://${ip.address()}:3000`
-    });
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+    if (server) {
+      server.close();
+    }
   });
+
+  startServer();
 }
 
-app.whenReady().then(createWindow);
+function startServer() {
+  const app = express();
+  const httpServer = http.createServer(app);
+  const io = socketIo(httpServer);
+
+  const connectedUsers = new Map();
+
+  io.on('connection', (socket) => {
+    console.log('Nuevo usuario conectado');
+
+    socket.on('join', (nickname) => {
+      socket.nickname = nickname;
+      connectedUsers.set(socket.id, nickname);
+      socket.emit('message', { nickname: 'Servidor', message: `¡Bienvenido al chat, ${nickname}!` });
+      socket.broadcast.emit('message', { nickname: 'Servidor', message: `${nickname} se ha unido al chat` });
+      io.emit('userCount', connectedUsers.size);
+    });
+
+    socket.on('message', (message) => {
+      if (message.startsWith('/')) {
+        handleCommand(socket, message);
+      } else {
+        broadcastMessage(socket.nickname, message);
+      }
+    });
+
+    socket.on('disconnect', () => {
+      if (socket.nickname) {
+        broadcastMessage('Servidor', `${socket.nickname} se ha desconectado`);
+        connectedUsers.delete(socket.id);
+        io.emit('userCount', connectedUsers.size);
+      }
+    });
+
+    const broadcastMessage = (sender, message) => {
+      io.emit('message', { nickname: sender, message });
+    };
+
+    const handleCommand = (socket, message) => {
+      const command = message.substring(1).trim();
+      switch (command) {
+        case 'help':
+          socket.emit('message', { nickname: 'Servidor', message: `Comandos disponibles: /help, /list, /hello, /date` });
+          break;
+        case 'list':
+          const usersList = Array.from(connectedUsers.values()).join(', ');
+          socket.emit('message', { nickname: 'Servidor', message: `Usuarios conectados: ${usersList}` });
+          break;
+        case 'hello':
+          socket.emit('message', { nickname: 'Servidor', message: `Hola, ${socket.nickname}!` });
+          break;
+        case 'date':
+          const currentDate = new Date().toLocaleString();
+          socket.emit('message', { nickname: 'Servidor', message: `Fecha y hora actual: ${currentDate}` });
+          break;
+        default:
+          socket.emit('message', { nickname: 'Servidor', message: `Comando no reconocido. Escribe /help para ver los comandos disponibles.` });
+          break;
+      }
+    };
+  });
+
+  const PORT = process.env.PORT || 3000;
+  httpServer.listen(PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
+  });
+
+  // Enviar información al front-end de Electron
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('server-started', {
+      nodeVersion: process.versions.node,
+      electronVersion: process.versions.electron,
+      chromeVersion: process.versions.chrome,
+      serverUrl: `http://${ip.address()}:${PORT}`
+    });
+  });
+
+  server = httpServer;
+}
+
+app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -39,90 +118,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+  if (mainWindow === null) {
     createWindow();
   }
-});
-
-// Server code for chat application
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-
-const chatApp = express();
-const server = http.createServer(chatApp);
-const io = socketIo(server);
-
-const PORT = 3000;
-
-let users = [];
-
-chatApp.use(express.static(path.join(__dirname, 'public')));
-
-io.on('connection', (socket) => {
-  console.log('Nuevo usuario conectado');
-
-  socket.on('join', (nickname) => {
-    socket.nickname = nickname;
-    users.push({ id: socket.id, nickname });
-    socket.broadcast.emit('message', { nickname: 'Servidor', message: `${nickname} se ha unido al chat` });
-    updateUserCount();
-  });
-
-  socket.on('message', (message) => {
-    if (message.startsWith('/')) {
-      handleCommand(message);
-    } else {
-      io.emit('message', { nickname: socket.nickname, message });
-    }
-  });
-
-  socket.on('typing', () => {
-    socket.broadcast.emit('typing', { nickname: socket.nickname });
-  });
-
-  socket.on('stopTyping', () => {
-    socket.broadcast.emit('stopTyping', { nickname: socket.nickname });
-  });
-
-  socket.on('disconnect', () => {
-    if (socket.nickname) {
-      const index = users.findIndex(user => user.id === socket.id);
-      if (index !== -1) {
-        const { nickname } = users[index];
-        users.splice(index, 1);
-        io.emit('message', { nickname: 'Servidor', message: `${nickname} se ha desconectado` });
-        updateUserCount();
-      }
-    }
-  });
-
-  const updateUserCount = () => {
-    io.emit('userCount', users.length);
-  };
-
-  const handleCommand = (message) => {
-    const command = message.substr(1).toLowerCase().trim();
-    switch (command) {
-      case 'help':
-        socket.emit('message', { nickname: 'Servidor', message: 'Lista de comandos: /help, /list, /hello, /date' });
-        break;
-      case 'list':
-        socket.emit('message', { nickname: 'Servidor', message: `Usuarios conectados: ${users.length}` });
-        break;
-      case 'hello':
-        socket.emit('message', { nickname: 'Servidor', message: '¡Hola! Bienvenido al chat' });
-        break;
-      case 'date':
-        socket.emit('message', { nickname: 'Servidor', message: `Fecha actual: ${new Date().toLocaleDateString()}` });
-        break;
-      default:
-        socket.emit('message', { nickname: 'Servidor', message: `Comando desconocido: ${message}` });
-        break;
-    }
-  };
-});
-
-server.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
