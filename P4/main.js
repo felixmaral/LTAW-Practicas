@@ -1,5 +1,5 @@
 // main.js
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { fork } = require('child_process');
 
@@ -11,9 +11,8 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      enableRemoteModule: false
+      nodeIntegration: true, // Habilitar nodeIntegration
+      contextIsolation: false // Desactivar el aislamiento de contexto
     }
   });
 
@@ -21,6 +20,16 @@ function createWindow() {
   
   mainWindow.on('closed', function () {
     mainWindow = null;
+  });
+
+  // Enviar las versiones al frontend
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('app-info', {
+      nodeVersion: process.versions.node,
+      chromeVersion: process.versions.chrome,
+      electronVersion: process.versions.electron,
+      serverUrl: 'http://localhost:3000'
+    });
   });
 }
 
